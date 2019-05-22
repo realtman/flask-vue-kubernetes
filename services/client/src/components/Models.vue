@@ -1,0 +1,516 @@
+<template>
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-10">
+        <h1>Model Parameters</h1>
+        <hr><br><br>
+        <alert :message=message v-if="showMessage"></alert>
+        <button type="button" class="btn btn-success btn-sm" v-b-modal.model-modal>Add model</button>
+        <br><br>
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th scope="col">Starting Inventory (Bushels)</th>
+              <th scope="col">Selling Price ($)</th>
+              <th scope="col">Shortage Cost ($)</th>
+              <th scope="col">Salvage Value ($)</th>
+              <th scope="col">NA Production Cost ($/Acre)</th>
+              <th scope="col">NA Processing Cost ($/(Bushel*Acre))</th>
+              <th scope="col">SA Production Cost ($/Acre)</th>
+              <th scope="col">SA Processing Cost ($/(Bushel*Acre))</th>
+              <th scope="col">Expected NA Yield (Bushels/Acre)</th>
+              <th scope="col">Expected SA Yield (Bushels/Acre)</th>
+              <th scope="col">Expected Demand (Bushels)</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(model, index) in models" :key="index">
+              <td>{{ model.starting_inventory }}</td>
+              <td>{{ model.price }}</td>
+              <td>{{ model.shortage }}</td>
+              <td>{{ model.salvage }}</td>
+              <td>{{ model.production_na }}</td>
+              <td>{{ model.processing_na }}</td>
+              <td>{{ model.production_sa }}</td>
+              <td>{{ model.processing_sa }}</td>
+              <td>{{ model.yield_na }}</td>
+              <td>{{ model.yield_sa }}</td>
+              <td>{{ model.demand }}</td>
+              <td>
+                <button
+                        type="button"
+                        class="btn btn-warning btn-sm"
+                        v-b-modal.model-update-modal
+                        @click="editmodel(model)">
+                    Update
+                </button>
+                <button
+                        type="button"
+                        class="btn btn-danger btn-sm"
+                        @click="onDeletemodel(model)">
+                    Delete
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <b-modal ref="addmodelModal"
+             id="model-modal"
+             size="huge"
+             title="Add a new model"
+             hide-footer>
+      <b-form @submit="onSubmit" @reset="onReset" class="w-100">
+        <b-container fluid>
+          <b-form-row id="form-starting_inventory-price">
+            <b-col id="form-starting_inventory" col="6">
+              <label for="form-starting_inventory-input">
+                Starting Inventory (Bushels):
+              </label>
+              <b-form-input id="form-starting_inventory-input"
+                            type="text"
+                            v-model="addmodelForm.starting_inventory"
+                            required
+                            placeholder="Enter starting inventory">
+              </b-form-input>
+            </b-col>
+            <b-col id="form-price" col="6">
+              <label for="form-price-input">
+                Selling Price ($/Bushel):
+              </label>
+              <b-form-input id="form-price-input"
+                            type="text"
+                            v-model="addmodelForm.price"
+                            required
+                            placeholder="Enter price">
+              </b-form-input>
+            </b-col>
+          </b-form-row>
+
+          <b-form-row id="form-shortage-salvage" style="margin-top:10px">
+            <b-col id="form-shortage" col="6">
+              <label for="form-shortage-input">
+                Shortage Cost ($/Bushel):
+              </label>
+              <b-form-input id="form-shortage-input"
+                            type="text"
+                            v-model="addmodelForm.shortage"
+                            required
+                            placeholder="Enter shortage cost">
+              </b-form-input>
+            </b-col>
+            <b-col id="form-salvage" col="6">
+              <label for="form-salvage-input">
+                Salvage Value ($/Bushel):
+              </label>
+              <b-form-input id="form-salvage-input"
+                            type="text"
+                            v-model="addmodelForm.salvage"
+                            required
+                            placeholder="Enter salvage value">
+              </b-form-input>
+            </b-col>
+          </b-form-row>
+
+          <b-form-row id="form-production_na-processing_na" style="margin-top:10px">
+            <b-col id="form-production_na" col="6">
+              <label for="form-production_na-input">
+                NA Production Cost ($/Acre):
+              </label>
+              <b-form-input id="form-production_na-input"
+                            type="text"
+                            v-model="addmodelForm.production_na"
+                            required
+                            placeholder="Enter NA production cost">
+              </b-form-input>
+            </b-col>
+            <b-col id="form-processing_na" col="6">
+              <label for="form-processing_na-input">
+                NA Processing Cost ($/(Bushel*Acre)):
+              </label>
+              <b-form-input id="form-processing_na-input"
+                            type="text"
+                            v-model="addmodelForm.processing_na"
+                            required
+                            placeholder="Enter NA processing cost">
+              </b-form-input>
+            </b-col>
+          </b-form-row>
+
+          <b-form-row id="form-production_sa-processing_sa" style="margin-top:10px">
+            <b-col id="form-production_sa" col="6">
+              <label for="form-production_sa-input">
+                SA Production Cost ($/Acre):
+              </label>
+              <b-form-input id="form-production_sa-input"
+                            type="text"
+                            v-model="addmodelForm.production_sa"
+                            required
+                            placeholder="Enter SA production cost">
+              </b-form-input>
+            </b-col>
+            <b-col id="form-processing_sa" col="6">
+              <label for="form-processing_sa-input">
+                SA Processing Cost ($/(Bushel*Acre)):
+              </label>
+              <b-form-input id="form-processing_sa-input"
+                            type="text"
+                            v-model="addmodelForm.processing_sa"
+                            required
+                            placeholder="Enter SA processing cost">
+              </b-form-input>
+            </b-col>
+          </b-form-row>
+
+          <b-form-row id="form-tables" style="margin-top:30px;margin-bottom:30px">
+            <b-col id="form-yield_na" col="3">
+              <div style="width:100%">
+                <mytable :columnNames="['NA Yield Probability','NA Yield (Bushels/Acre)']"></mytable>
+              </div>
+            </b-col>
+            <b-col id="form-yield_sa" col="3">
+              <div style="width:100%">
+                <mytable :columnNames="['SA Yield Probability','SA Yield (Bushels/Acre)']"></mytable>
+              </div>
+            </b-col>
+            <b-col id="form-demand" col="3">
+              <div style="width:100%">
+                <mytable :columnNames="['Demand Probability','Demand (Bushels)']"></mytable>
+              </div>
+            </b-col>
+          </b-form-row>
+        </b-container>
+
+          <!-- <div style="width:300px">
+            <div style="padding:5px;display:inline-block">
+              <mytable :columnNames="['NA Yield Probability','NA Yield (Bushels/Acre)']"></mytable>
+            </div>
+            <div style="padding:5px;display:inline-block">
+              <mytable :columnNames="['SA Yield Probability','SA Yield (Bushels/Acre)']"></mytable>
+            </div>
+            <div style="padding:5px;display:inline-block">
+              <mytable :columnNames="['Demand Probability','Demand (Bushels)']"></mytable>
+            </div>
+          </div> -->
+        <b-button type="submit" variant="primary">Submit</b-button>
+        <b-button type="reset" variant="danger">Reset</b-button>
+      </b-form>
+    </b-modal>
+    <b-modal ref="editmodelModal"
+             id="model-update-modal"
+             title="Update"
+             hide-footer>
+      <b-form @submit="onSubmitUpdate" @reset="onResetUpdate" class="w-100">
+        <b-container fluid>
+          <b-form-row id="form-edit-starting_inventory-price">
+            <b-col id="form-edit-starting_inventory" col="6">
+              <label for="form-edit-starting_inventory-input">
+                Starting Inventory (Bushels):
+              </label>
+              <b-form-input id="form-edit-starting_inventory-input"
+                            type="text"
+                            v-model="addmodelForm.starting_inventory"
+                            required
+                            placeholder="Enter starting inventory">
+              </b-form-input>
+            </b-col>
+            <b-col id="form-edit-price" col="6">
+              <label for="form-edit-price-input">
+                Selling Price ($/Bushel):
+              </label>
+              <b-form-input id="form-edit-price-input"
+                            type="text"
+                            v-model="addmodelForm.price"
+                            required
+                            placeholder="Enter price">
+              </b-form-input>
+            </b-col>
+          </b-form-row>
+
+          <b-form-row id="form-edit-shortage-salvage" style="margin-top:10px">
+            <b-col id="form-edit-shortage" col="6">
+              <label for="form-edit-shortage-input">
+                Shortage Cost ($/Bushel):
+              </label>
+              <b-form-input id="form-edit-shortage-input"
+                            type="text"
+                            v-model="addmodelForm.shortage"
+                            required
+                            placeholder="Enter shortage cost">
+              </b-form-input>
+            </b-col>
+            <b-col id="form-edit-salvage" col="6">
+              <label for="form-edit-salvage-input">
+                Salvage Value ($/Bushel):
+              </label>
+              <b-form-input id="form-edit-salvage-input"
+                            type="text"
+                            v-model="addmodelForm.salvage"
+                            required
+                            placeholder="Enter salvage value">
+              </b-form-input>
+            </b-col>
+          </b-form-row>
+
+          <b-form-row id="form-edit-production_na-processing_na" style="margin-top:10px">
+            <b-col id="form-edit-production_na" col="6">
+              <label for="form-edit-production_na-input">
+                NA Production Cost ($/Acre):
+              </label>
+              <b-form-input id="form-edit-production_na-input"
+                            type="text"
+                            v-model="addmodelForm.production_na"
+                            required
+                            placeholder="Enter NA production cost">
+              </b-form-input>
+            </b-col>
+            <b-col id="form-edit-processing_na" col="6">
+              <label for="form-edit-processing_na-input">
+                NA Processing Cost ($/(Bushel*Acre)):
+              </label>
+              <b-form-input id="form-edit-processing_na-input"
+                            type="text"
+                            v-model="addmodelForm.processing_na"
+                            required
+                            placeholder="Enter NA processing cost">
+              </b-form-input>
+            </b-col>
+          </b-form-row>
+
+          <b-form-row id="form-edit-production_sa-processing_sa" style="margin-top:10px">
+            <b-col id="form-edit-production_sa" col="6">
+              <label for="form-edit-production_sa-input">
+                SA Production Cost ($/Acre):
+              </label>
+              <b-form-input id="form-edit-production_sa-input"
+                            type="text"
+                            v-model="addmodelForm.production_sa"
+                            required
+                            placeholder="Enter SA production cost">
+              </b-form-input>
+            </b-col>
+            <b-col id="form-edit-processing_sa" col="6">
+              <label for="form-edit-processing_sa-input">
+                SA Processing Cost ($/(Bushel*Acre)):
+              </label>
+              <b-form-input id="form-edit-processing_sa-input"
+                            type="text"
+                            v-model="addmodelForm.processing_sa"
+                            required
+                            placeholder="Enter SA processing cost">
+              </b-form-input>
+            </b-col>
+          </b-form-row>
+
+          <b-form-row id="form-edit-tables" style="margin-top:30px;margin-bottom:30px">
+            <b-col id="form-edit-yield_na" col="3">
+              <div style="width:100%">
+                <mytable :columnNames="['NA Yield Probability','NA Yield (Bushels/Acre)']"></mytable>
+              </div>
+            </b-col>
+            <b-col id="form-edit-yield_sa" col="3">
+              <div style="width:100%">
+                <mytable :columnNames="['SA Yield Probability','SA Yield (Bushels/Acre)']"></mytable>
+              </div>
+            </b-col>
+            <b-col id="form-edit-demand" col="3">
+              <div style="width:100%">
+                <mytable :columnNames="['Demand Probability','Demand (Bushels)']"></mytable>
+              </div>
+            </b-col>
+          </b-form-row>
+        </b-container>
+        <b-button type="submit" variant="primary">Update</b-button>
+        <b-button type="reset" variant="danger">Cancel</b-button>
+      </b-form>
+    </b-modal>
+  </div>
+</template>
+
+<script>
+import axios from 'axios';
+import Alert from './Alert';
+import MyTable from './Table';
+
+export default {
+  data() {
+    return {
+      models: [],
+      addmodelForm: {
+        starting_inventory: '',
+        price: '',
+        shortage: '',
+        salvage: '',
+        production_na: '',
+        processing_na: '',
+        production_sa: '',
+        processing_sa: '',
+        yield_prob_na: [],
+        yield_na: [],
+        yield_prob_sa: [],
+        yield_sa: [],
+        demand_prob: [],
+        demand: [],
+      },
+      editForm: {
+        id: '',
+        starting_inventory: '',
+        price: '',
+        shortage: '',
+        salvage: '',
+        production_na: '',
+        processing_na: '',
+        production_sa: '',
+        processing_sa: '',
+        yield_prob_na: [],
+        yield_na: [],
+        yield_prob_sa: [],
+        yield_sa: [],
+        demand_prob: [],
+        demand: [],
+      },
+      message: '',
+      showMessage: false,
+      ROOT_API: process.env.ROOT_API,
+    };
+  },
+  components: {
+    alert: Alert,
+    mytable: MyTable,
+  },
+  methods: {
+    getmodels() {
+      const path = `${this.ROOT_API}/models`;
+      axios.get(path)
+        .then((res) => {
+          this.models = res.data.models;
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.error(error);
+        });
+    },
+    addmodel(payload) {
+      const path = `${this.ROOT_API}/models`;
+      axios.post(path, payload)
+        .then(() => {
+          this.getmodels();
+          this.message = 'model added!';
+          this.showMessage = true;
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.error(error);
+          this.getmodels();
+        });
+    },
+    updatemodel(payload, modelID) {
+      const path = `${this.ROOT_API}/models/${modelID}`;
+      axios.put(path, payload)
+        .then(() => {
+          this.getmodels();
+          this.message = 'model updated!';
+          this.showMessage = true;
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.error(error);
+          this.getmodels();
+        });
+    },
+    removemodel(modelID) {
+      const path = `${this.ROOT_API}/models/${modelID}`;
+      axios.delete(path)
+        .then(() => {
+          this.getmodels();
+          this.message = 'model removed!';
+          this.showMessage = true;
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.error(error);
+          this.getmodels();
+        });
+    },
+    initForm() {
+      this.addmodelForm.starting_inventory = '';
+      this.addmodelForm.price = '';
+      this.addmodelForm.shortage = '';
+      this.addmodelForm.salvage = '';
+      this.addmodelForm.production_na = '';
+      this.addmodelForm.processing_na = '';
+      this.addmodelForm.production_sa = '';
+      this.addmodelForm.processing_sa = '';
+      this.addmodelForm.yield_prob_na = [];
+      this.addmodelForm.yield_na = [];
+      this.addmodelForm.yield_prob_sa = [];
+      this.addmodelForm.yield_sa = [];
+      this.addmodelForm.demand_prob = [];
+      this.addmodelForm.demand = [];
+      this.editForm.id = '';
+      this.editForm.starting_inventory = '';
+      this.editForm.price = '';
+      this.editForm.shortage = '';
+      this.editForm.salvage = '';
+      this.editForm.production_na = '';
+      this.editForm.processing_na = '';
+      this.editForm.production_sa = '';
+      this.editForm.processing_sa = '';
+      this.editForm.yield_prob_na = [];
+      this.editForm.yield_na = [];
+      this.editForm.yield_prob_sa = [];
+      this.editForm.yield_sa = [];
+      this.editForm.demand_prob = [];
+      this.editForm.demand = [];
+    },
+    onSubmit(evt) {
+      evt.preventDefault();
+      this.$refs.addmodelModal.hide();
+      const payload = {};
+      for (const [key, value] of Object.entries(this.addmodelForm)) {
+        payload[key] = value;
+      }
+      this.addmodel(payload);
+      this.initForm();
+    },
+    onSubmitUpdate(evt) {
+      evt.preventDefault();
+      this.$refs.editmodelModal.hide();
+      const payload = {};
+      for (const [key, value] of Object.entries(this.editForm)) {
+        payload[key] = value;
+      }
+      this.updatemodel(payload, this.editForm.id);
+    },
+    onReset(evt) {
+      evt.preventDefault();
+      this.$refs.addmodelModal.hide();
+      this.initForm();
+    },
+    onResetUpdate(evt) {
+      evt.preventDefault();
+      this.$refs.editmodelModal.hide();
+      this.initForm();
+      this.getmodels(); // why?
+    },
+    onDeletemodel(model) {
+      this.removemodel(model.id);
+    },
+    editmodel(model) {
+      this.editForm = model;
+    },
+  },
+  created() {
+    this.getmodels();
+  },
+};
+</script>
+
+<style>
+.modal .modal-huge {
+  max-width: 1300px;
+  width: 1300px;
+}
+</style>
