@@ -11,6 +11,7 @@ class SupplyModel(db.Model):
     __tablename__ = 'models'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    label = db.Column(db.String(255))
     created_date = db.Column(db.DateTime)
     starting_inventory = db.Column(db.Float)
     price = db.Column(db.Float)

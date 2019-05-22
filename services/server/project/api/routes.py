@@ -44,7 +44,7 @@ def single_model(model_id):
     if request.method == 'PUT':
         post_data = request.get_json()
         for k in post_data:
-            model.__dict__[k] = post_data.get(k)
+            setattr(model, k, post_data[k])
         db.session.commit()
         response_object['message'] = 'Model updated!'
     if request.method == 'DELETE':

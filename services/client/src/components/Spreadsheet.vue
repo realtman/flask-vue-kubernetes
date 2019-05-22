@@ -1,5 +1,5 @@
 <template>
-    <hot-table :settings="hotSettings"></hot-table>
+    <hot-table :data="data" :settings="hotSettings"></hot-table>
 </template>
 
 <script>
@@ -7,16 +7,14 @@ import { HotTable } from '@handsontable/vue';
 
 export default {
   components: { HotTable },
-  props: ['columnNames'],
+  props: ['colnames'],
   data() {
     return {
+      data: [['', '']],
       hotSettings: {
-        data: [['', '']],
-        colHeaders: this.columnNames,
+        colHeaders: this.colnames,
         rowHeaders: true,
-        // autoColumnSize: true,
         height: 320,
-        // colWidths: [150, 200],
         licenseKey: 'non-commercial-and-evaluation',
       },
     };
@@ -24,7 +22,7 @@ export default {
   methods: {
     setData(data) {
       this.$refs.hotTableComponent.hotInstance.loadData(data);
-    }
+    },
   },
 };
 </script>

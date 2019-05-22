@@ -19,6 +19,7 @@ def recreate_db():
 def seed_db():
     """Seeds the database."""
     db.session.add(SupplyModel(
+        label = "test",
         starting_inventory = 170,
         price = 775,
         shortage = 1200,

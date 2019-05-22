@@ -1,15 +1,17 @@
 <template>
   <div class="container">
     <div class="row">
-      <div class="col-sm-10">
+      <div class="col-sm-12">
         <h1>Model Parameters</h1>
         <hr><br><br>
         <alert :message=message v-if="showMessage"></alert>
-        <button type="button" class="btn btn-success btn-sm" v-b-modal.model-modal>Add model</button>
+        <button type="button" class="btn btn-success btn-sm"
+                v-b-modal.model-modal>Add Model</button>
         <br><br>
         <table class="table table-hover">
           <thead>
             <tr>
+              <th scope="col">Model Label</th>
               <th scope="col">Starting Inventory (Bushels)</th>
               <th scope="col">Selling Price ($)</th>
               <th scope="col">Shortage Cost ($)</th>
@@ -26,6 +28,7 @@
           </thead>
           <tbody>
             <tr v-for="(model, index) in models" :key="index">
+              <td>{{ model.label }}</td>
               <td>{{ model.starting_inventory }}</td>
               <td>{{ model.price }}</td>
               <td>{{ model.shortage }}</td>
@@ -38,18 +41,17 @@
               <td>{{ model.yield_sa }}</td>
               <td>{{ model.demand }}</td>
               <td>
-                <button
-                        type="button"
+                <button type="button"
                         class="btn btn-warning btn-sm"
+                        style="padding-bottom:5px"
                         v-b-modal.model-update-modal
-                        @click="editmodel(model)">
+                        @click="editModel(model)">
                     Update
                 </button>
-                <button
-                        type="button"
+                <button type="button"
                         class="btn btn-danger btn-sm"
-                        @click="onDeletemodel(model)">
-                    Delete
+                        @click="onDeleteModel(model)">
+                  Delete
                 </button>
               </td>
             </tr>
@@ -64,6 +66,17 @@
              hide-footer>
       <b-form @submit="onSubmit" @reset="onReset" class="w-100">
         <b-container fluid>
+          <b-form-group id="form-label">
+            <label for="form-label-input">
+                Model Label (<i>optional</i>):
+              </label>
+              <b-form-input id="form-label-input"
+                            type="text"
+                            v-model="addmodelForm.label"
+                            required
+                            placeholder="Enter label for model">
+              </b-form-input>
+          </b-form-group>
           <b-form-row id="form-starting_inventory-price">
             <b-col id="form-starting_inventory" col="6">
               <label for="form-starting_inventory-input">
@@ -167,43 +180,44 @@
           <b-form-row id="form-tables" style="margin-top:30px;margin-bottom:30px">
             <b-col id="form-yield_na" col="3">
               <div style="width:100%">
-                <mytable :columnNames="['NA Yield Probability','NA Yield (Bushels/Acre)']"></mytable>
+                <sheet :colnames="['NA Yield Probability','NA Yield (Bushels/Acre)']"></sheet>
               </div>
             </b-col>
             <b-col id="form-yield_sa" col="3">
               <div style="width:100%">
-                <mytable :columnNames="['SA Yield Probability','SA Yield (Bushels/Acre)']"></mytable>
+                <sheet :colnames="['SA Yield Probability','SA Yield (Bushels/Acre)']"></sheet>
               </div>
             </b-col>
             <b-col id="form-demand" col="3">
               <div style="width:100%">
-                <mytable :columnNames="['Demand Probability','Demand (Bushels)']"></mytable>
+                <sheet :colnames="['Demand Probability','Demand (Bushels)']"></sheet>
               </div>
             </b-col>
           </b-form-row>
         </b-container>
 
-          <!-- <div style="width:300px">
-            <div style="padding:5px;display:inline-block">
-              <mytable :columnNames="['NA Yield Probability','NA Yield (Bushels/Acre)']"></mytable>
-            </div>
-            <div style="padding:5px;display:inline-block">
-              <mytable :columnNames="['SA Yield Probability','SA Yield (Bushels/Acre)']"></mytable>
-            </div>
-            <div style="padding:5px;display:inline-block">
-              <mytable :columnNames="['Demand Probability','Demand (Bushels)']"></mytable>
-            </div>
-          </div> -->
         <b-button type="submit" variant="primary">Submit</b-button>
         <b-button type="reset" variant="danger">Reset</b-button>
       </b-form>
     </b-modal>
-    <b-modal ref="editmodelModal"
+    <b-modal ref="editModelModal"
              id="model-update-modal"
+             size="huge"
              title="Update"
              hide-footer>
       <b-form @submit="onSubmitUpdate" @reset="onResetUpdate" class="w-100">
         <b-container fluid>
+          <b-form-group id="form-edit-label">
+            <label for="form-edit-label-input">
+                Model Label (<i>optional</i>):
+              </label>
+              <b-form-input id="form-edit-label-input"
+                            type="text"
+                            v-model="editForm.label"
+                            required
+                            placeholder="Enter label for model">
+              </b-form-input>
+          </b-form-group>
           <b-form-row id="form-edit-starting_inventory-price">
             <b-col id="form-edit-starting_inventory" col="6">
               <label for="form-edit-starting_inventory-input">
@@ -211,7 +225,7 @@
               </label>
               <b-form-input id="form-edit-starting_inventory-input"
                             type="text"
-                            v-model="addmodelForm.starting_inventory"
+                            v-model="editForm.starting_inventory"
                             required
                             placeholder="Enter starting inventory">
               </b-form-input>
@@ -222,7 +236,7 @@
               </label>
               <b-form-input id="form-edit-price-input"
                             type="text"
-                            v-model="addmodelForm.price"
+                            v-model="editForm.price"
                             required
                             placeholder="Enter price">
               </b-form-input>
@@ -236,7 +250,7 @@
               </label>
               <b-form-input id="form-edit-shortage-input"
                             type="text"
-                            v-model="addmodelForm.shortage"
+                            v-model="editForm.shortage"
                             required
                             placeholder="Enter shortage cost">
               </b-form-input>
@@ -247,7 +261,7 @@
               </label>
               <b-form-input id="form-edit-salvage-input"
                             type="text"
-                            v-model="addmodelForm.salvage"
+                            v-model="editForm.salvage"
                             required
                             placeholder="Enter salvage value">
               </b-form-input>
@@ -261,7 +275,7 @@
               </label>
               <b-form-input id="form-edit-production_na-input"
                             type="text"
-                            v-model="addmodelForm.production_na"
+                            v-model="editForm.production_na"
                             required
                             placeholder="Enter NA production cost">
               </b-form-input>
@@ -272,7 +286,7 @@
               </label>
               <b-form-input id="form-edit-processing_na-input"
                             type="text"
-                            v-model="addmodelForm.processing_na"
+                            v-model="editForm.processing_na"
                             required
                             placeholder="Enter NA processing cost">
               </b-form-input>
@@ -286,7 +300,7 @@
               </label>
               <b-form-input id="form-edit-production_sa-input"
                             type="text"
-                            v-model="addmodelForm.production_sa"
+                            v-model="editForm.production_sa"
                             required
                             placeholder="Enter SA production cost">
               </b-form-input>
@@ -297,7 +311,7 @@
               </label>
               <b-form-input id="form-edit-processing_sa-input"
                             type="text"
-                            v-model="addmodelForm.processing_sa"
+                            v-model="editForm.processing_sa"
                             required
                             placeholder="Enter SA processing cost">
               </b-form-input>
@@ -307,17 +321,17 @@
           <b-form-row id="form-edit-tables" style="margin-top:30px;margin-bottom:30px">
             <b-col id="form-edit-yield_na" col="3">
               <div style="width:100%">
-                <mytable :columnNames="['NA Yield Probability','NA Yield (Bushels/Acre)']"></mytable>
+                <sheet :colnames="['NA Yield Probability','NA Yield (Bushels/Acre)']"></sheet>
               </div>
             </b-col>
             <b-col id="form-edit-yield_sa" col="3">
               <div style="width:100%">
-                <mytable :columnNames="['SA Yield Probability','SA Yield (Bushels/Acre)']"></mytable>
+                <sheet :colnames="['SA Yield Probability','SA Yield (Bushels/Acre)']"></sheet>
               </div>
             </b-col>
             <b-col id="form-edit-demand" col="3">
               <div style="width:100%">
-                <mytable :columnNames="['Demand Probability','Demand (Bushels)']"></mytable>
+                <sheet :colnames="['Demand Probability','Demand (Bushels)']"></sheet>
               </div>
             </b-col>
           </b-form-row>
@@ -332,7 +346,7 @@
 <script>
 import axios from 'axios';
 import Alert from './Alert';
-import MyTable from './Table';
+import Sheet from './Spreadsheet';
 
 export default {
   data() {
@@ -378,7 +392,7 @@ export default {
   },
   components: {
     alert: Alert,
-    mytable: MyTable,
+    sheet: Sheet,
   },
   methods: {
     getmodels() {
@@ -397,7 +411,7 @@ export default {
       axios.post(path, payload)
         .then(() => {
           this.getmodels();
-          this.message = 'model added!';
+          this.message = 'Model added!';
           this.showMessage = true;
         })
         .catch((error) => {
@@ -411,7 +425,7 @@ export default {
       axios.put(path, payload)
         .then(() => {
           this.getmodels();
-          this.message = 'model updated!';
+          this.message = 'Model updated!';
           this.showMessage = true;
         })
         .catch((error) => {
@@ -425,7 +439,7 @@ export default {
       axios.delete(path)
         .then(() => {
           this.getmodels();
-          this.message = 'model removed!';
+          this.message = 'Model removed!';
           this.showMessage = true;
         })
         .catch((error) => {
@@ -469,19 +483,19 @@ export default {
       evt.preventDefault();
       this.$refs.addmodelModal.hide();
       const payload = {};
-      for (const [key, value] of Object.entries(this.addmodelForm)) {
+      Object.entries(this.addmodelForm).forEach(([key, value]) => {
         payload[key] = value;
-      }
+      });
       this.addmodel(payload);
       this.initForm();
     },
     onSubmitUpdate(evt) {
       evt.preventDefault();
-      this.$refs.editmodelModal.hide();
+      this.$refs.editModelModal.hide();
       const payload = {};
-      for (const [key, value] of Object.entries(this.editForm)) {
+      Object.entries(this.editForm).forEach(([key, value]) => {
         payload[key] = value;
-      }
+      });
       this.updatemodel(payload, this.editForm.id);
     },
     onReset(evt) {
@@ -491,14 +505,14 @@ export default {
     },
     onResetUpdate(evt) {
       evt.preventDefault();
-      this.$refs.editmodelModal.hide();
+      this.$refs.editModelModal.hide();
       this.initForm();
       this.getmodels(); // why?
     },
-    onDeletemodel(model) {
+    onDeleteModel(model) {
       this.removemodel(model.id);
     },
-    editmodel(model) {
+    editModel(model) {
       this.editForm = model;
     },
   },
