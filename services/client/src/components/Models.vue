@@ -13,9 +13,9 @@
             <tr>
               <th scope="col">Model Label</th>
               <th scope="col">Starting Inventory (Bushels)</th>
-              <th scope="col">Selling Price ($)</th>
-              <th scope="col">Shortage Cost ($)</th>
-              <th scope="col">Salvage Value ($)</th>
+              <th scope="col">Selling Price ($/Bushel)</th>
+              <th scope="col">Shortage Cost ($/Bushel)</th>
+              <th scope="col">Salvage Value ($/Bushel)</th>
               <th scope="col">NA Production Cost ($/Acre)</th>
               <th scope="col">NA Processing Cost ($/(Bushel*Acre))</th>
               <th scope="col">SA Production Cost ($/Acre)</th>
@@ -46,7 +46,7 @@
                         style="padding-bottom:5px"
                         v-b-modal.model-update-modal
                         @click="editModel(model)">
-                    Update
+                  Update
                 </button>
                 <button type="button"
                         class="btn btn-danger btn-sm"
@@ -68,14 +68,13 @@
         <b-container fluid>
           <b-form-group id="form-label">
             <label for="form-label-input">
-                Model Label (<i>optional</i>):
-              </label>
-              <b-form-input id="form-label-input"
-                            type="text"
-                            v-model="addmodelForm.label"
-                            required
-                            placeholder="Enter label for model">
-              </b-form-input>
+              Model Label (<i>optional</i>):
+            </label>
+            <b-form-input id="form-label-input"
+                          type="text"
+                          v-model="addmodelForm.label"
+                          placeholder="Enter label for model">
+            </b-form-input>
           </b-form-group>
           <b-form-row id="form-starting_inventory-price">
             <b-col id="form-starting_inventory" col="6">
@@ -180,17 +179,20 @@
           <b-form-row id="form-tables" style="margin-top:30px;margin-bottom:30px">
             <b-col id="form-yield_na" col="3">
               <div style="width:100%">
-                <sheet :colnames="['NA Yield Probability','NA Yield (Bushels/Acre)']"></sheet>
+                <sheet :colnames="['NA Yield Probability','NA Yield (Bushels/Acre)']"
+                       :data="addmodelForm.yield_na"></sheet>
               </div>
             </b-col>
             <b-col id="form-yield_sa" col="3">
               <div style="width:100%">
-                <sheet :colnames="['SA Yield Probability','SA Yield (Bushels/Acre)']"></sheet>
+                <sheet :colnames="['SA Yield Probability','SA Yield (Bushels/Acre)']"
+                       :data="addmodelForm.yield_sa"></sheet>
               </div>
             </b-col>
             <b-col id="form-demand" col="3">
               <div style="width:100%">
-                <sheet :colnames="['Demand Probability','Demand (Bushels)']"></sheet>
+                <sheet :colnames="['Demand Probability','Demand (Bushels)']"
+                       :data="addmodelForm.demand"></sheet>
               </div>
             </b-col>
           </b-form-row>
@@ -209,14 +211,13 @@
         <b-container fluid>
           <b-form-group id="form-edit-label">
             <label for="form-edit-label-input">
-                Model Label (<i>optional</i>):
-              </label>
-              <b-form-input id="form-edit-label-input"
-                            type="text"
-                            v-model="editForm.label"
-                            required
-                            placeholder="Enter label for model">
-              </b-form-input>
+              Model Label (<i>optional</i>):
+            </label>
+            <b-form-input id="form-edit-label-input"
+                          type="text"
+                          v-model="editForm.label"
+                          placeholder="Enter label for model">
+            </b-form-input>
           </b-form-group>
           <b-form-row id="form-edit-starting_inventory-price">
             <b-col id="form-edit-starting_inventory" col="6">
@@ -321,17 +322,20 @@
           <b-form-row id="form-edit-tables" style="margin-top:30px;margin-bottom:30px">
             <b-col id="form-edit-yield_na" col="3">
               <div style="width:100%">
-                <sheet :colnames="['NA Yield Probability','NA Yield (Bushels/Acre)']"></sheet>
+                <sheet :colnames="['NA Yield Probability','NA Yield (Bushels/Acre)']"
+                       :data="editForm.yield_na"></sheet>
               </div>
             </b-col>
             <b-col id="form-edit-yield_sa" col="3">
               <div style="width:100%">
-                <sheet :colnames="['SA Yield Probability','SA Yield (Bushels/Acre)']"></sheet>
+                <sheet :colnames="['SA Yield Probability','SA Yield (Bushels/Acre)']"
+                       :data="editForm.yield_sa"></sheet>
               </div>
             </b-col>
             <b-col id="form-edit-demand" col="3">
               <div style="width:100%">
-                <sheet :colnames="['Demand Probability','Demand (Bushels)']"></sheet>
+                <sheet :colnames="['Demand Probability','Demand (Bushels)']"
+                       :data="editForm.demand"></sheet>
               </div>
             </b-col>
           </b-form-row>
@@ -353,6 +357,7 @@ export default {
     return {
       models: [],
       addmodelForm: {
+        label: '',
         starting_inventory: '',
         price: '',
         shortage: '',
@@ -361,15 +366,13 @@ export default {
         processing_na: '',
         production_sa: '',
         processing_sa: '',
-        yield_prob_na: [],
-        yield_na: [],
-        yield_prob_sa: [],
-        yield_sa: [],
-        demand_prob: [],
-        demand: [],
+        yield_na: [['', '']],
+        yield_sa: [['', '']],
+        demand: [['', '']],
       },
       editForm: {
         id: '',
+        label: '',
         starting_inventory: '',
         price: '',
         shortage: '',
@@ -378,12 +381,9 @@ export default {
         processing_na: '',
         production_sa: '',
         processing_sa: '',
-        yield_prob_na: [],
-        yield_na: [],
-        yield_prob_sa: [],
-        yield_sa: [],
-        demand_prob: [],
-        demand: [],
+        yield_na: [['', '']],
+        yield_sa: [['', '']],
+        demand: [['', '']],
       },
       message: '',
       showMessage: false,
@@ -449,35 +449,47 @@ export default {
         });
     },
     initForm() {
-      this.addmodelForm.starting_inventory = '';
-      this.addmodelForm.price = '';
-      this.addmodelForm.shortage = '';
-      this.addmodelForm.salvage = '';
-      this.addmodelForm.production_na = '';
-      this.addmodelForm.processing_na = '';
-      this.addmodelForm.production_sa = '';
-      this.addmodelForm.processing_sa = '';
-      this.addmodelForm.yield_prob_na = [];
-      this.addmodelForm.yield_na = [];
-      this.addmodelForm.yield_prob_sa = [];
-      this.addmodelForm.yield_sa = [];
-      this.addmodelForm.demand_prob = [];
-      this.addmodelForm.demand = [];
-      this.editForm.id = '';
-      this.editForm.starting_inventory = '';
-      this.editForm.price = '';
-      this.editForm.shortage = '';
-      this.editForm.salvage = '';
-      this.editForm.production_na = '';
-      this.editForm.processing_na = '';
-      this.editForm.production_sa = '';
-      this.editForm.processing_sa = '';
-      this.editForm.yield_prob_na = [];
-      this.editForm.yield_na = [];
-      this.editForm.yield_prob_sa = [];
-      this.editForm.yield_sa = [];
-      this.editForm.demand_prob = [];
-      this.editForm.demand = [];
+      Object.keys(this.addmodelForm).forEach((key) => {
+        if ((key in ['yield_na', 'yield_sa', 'demand'])) {
+          this.addmodelForm[key] = [['', '']];
+        } else {
+          this.addmodelForm[key] = '';
+        }
+      });
+      Object.keys(this.editForm).forEach((key) => {
+        if ((key in ['yield_na', 'yield_sa', 'demand'])) {
+          this.editForm[key] = [['', '']];
+        } else {
+          this.editForm[key] = '';
+        }
+      });
+      // this.addmodelForm.starting_inventory = '';
+      // this.addmodelForm.price = '';
+      // this.addmodelForm.shortage = '';
+      // this.addmodelForm.salvage = '';
+      // this.addmodelForm.production_na = '';
+      // this.addmodelForm.processing_na = '';
+      // this.addmodelForm.production_sa = '';
+      // this.addmodelForm.processing_sa = '';
+      // this.addmodelForm.yield_prob_na = [];
+      // this.addmodelForm.yield_na = [];
+      // this.addmodelForm.yield_sa = [];
+      // this.addmodelForm.demand = [];
+      // this.editForm.id = '';
+      // this.editForm.starting_inventory = '';
+      // this.editForm.price = '';
+      // this.editForm.shortage = '';
+      // this.editForm.salvage = '';
+      // this.editForm.production_na = '';
+      // this.editForm.processing_na = '';
+      // this.editForm.production_sa = '';
+      // this.editForm.processing_sa = '';
+      // this.editForm.yield_prob_na = [];
+      // this.editForm.yield_na = [];
+      // this.editForm.yield_prob_sa = [];
+      // this.editForm.yield_sa = [];
+      // this.editForm.demand_prob = [];
+      // this.editForm.demand = [];
     },
     onSubmit(evt) {
       evt.preventDefault();
@@ -496,6 +508,7 @@ export default {
       Object.entries(this.editForm).forEach(([key, value]) => {
         payload[key] = value;
       });
+      console.log(JSON.stringify(this.editForm));
       this.updatemodel(payload, this.editForm.id);
     },
     onReset(evt) {

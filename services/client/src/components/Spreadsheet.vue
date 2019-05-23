@@ -1,5 +1,5 @@
 <template>
-    <hot-table :data="data" :settings="hotSettings"></hot-table>
+    <hot-table v-bind:key="data.length" :data="data" :settings="hotSettings"></hot-table>
 </template>
 
 <script>
@@ -19,10 +19,21 @@ export default {
       },
     };
   },
+  // computed: {
+  //   fieldModelValue: {
+  //     get() {
+  //       return this.value;
+  //     },
+  //     set(newValue) {
+  //       this.$emit('input', newValue);
+  //     },
+  //   },
+  // },
   methods: {
-    setData(data) {
-      this.$refs.hotTableComponent.hotInstance.loadData(data);
-    },
+    // updateData() {
+    //   console.log(JSON.stringify({ updateData: this.$refs.testHot.table.getSourceDataArray() }));
+    //   this.$emit('input', this.$refs.testHot.table.getSourceDataArray());
+    // },
   },
 };
 </script>
