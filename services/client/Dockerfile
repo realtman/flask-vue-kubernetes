@@ -12,6 +12,7 @@ COPY . .
 
 ARG ROOT_API=http://localhost:5001
 ENV ROOT_API ${ROOT_API}
+ENV NODE_ENV development
 RUN npm run build
 
 EXPOSE 8080

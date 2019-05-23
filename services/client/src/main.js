@@ -7,6 +7,7 @@ import router from './router';
 Vue.config.productionTip = false;
 
 Vue.use(BootstrapVue);
+// Vue.use(VueCookies);
 
 /* eslint-disable no-new */
 new Vue({
