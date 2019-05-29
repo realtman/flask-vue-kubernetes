@@ -28,11 +28,11 @@ def seed_db():
         processing_na = 53,
         production_sa = 4000,
         processing_sa = 67,
-        yield_prob_na = [],
+        # yield_prob_na = [],
         yield_na = [],
-        yield_prob_sa = [],
+        # yield_prob_sa = [],
         yield_sa = [],
-        demand_prob = [],
+        # demand_prob = [],
         demand = []
     ))
     db.session.commit()

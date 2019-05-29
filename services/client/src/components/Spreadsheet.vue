@@ -1,5 +1,5 @@
 <template>
-    <hot-table v-bind:key="data.length" :data="data" :settings="hotSettings"></hot-table>
+    <hot-table :data="data" :settings="hotSettings"></hot-table>
 </template>
 
 <script>
@@ -10,30 +10,28 @@ export default {
   props: ['colnames'],
   data() {
     return {
-      data: [['', '']],
+      data: [[null, null]],
       hotSettings: {
         colHeaders: this.colnames,
         rowHeaders: true,
         height: 320,
         licenseKey: 'non-commercial-and-evaluation',
+        columns: [
+          {
+            data: 'col0',
+            type: 'numeric',
+          },
+          {
+            data: 'col1',
+            type: 'numeric',
+          },
+        ],
+        afterChange() {
+          const myData = this.getSourceDataArray();
+          this.rootElement.__vue__.$emit('onChangeSheet', myData);
+        },
       },
     };
-  },
-  // computed: {
-  //   fieldModelValue: {
-  //     get() {
-  //       return this.value;
-  //     },
-  //     set(newValue) {
-  //       this.$emit('input', newValue);
-  //     },
-  //   },
-  // },
-  methods: {
-    // updateData() {
-    //   console.log(JSON.stringify({ updateData: this.$refs.testHot.table.getSourceDataArray() }));
-    //   this.$emit('input', this.$refs.testHot.table.getSourceDataArray());
-    // },
   },
 };
 </script>
