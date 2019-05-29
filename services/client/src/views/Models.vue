@@ -323,18 +323,21 @@
             <b-col id="form-edit-yield_na" cols="3">
               <div style="width:100%">
                 <sheet :colnames="['NA Yield Probability','NA Yield (Bushels/Acre)']"
+                       :value="editForm.yield_na"
                        @onChangeSheet="editForm.yield_na = $event"></sheet>
               </div>
             </b-col>
             <b-col id="form-edit-yield_sa" cols="3">
               <div style="width:100%">
                 <sheet :colnames="['SA Yield Probability','SA Yield (Bushels/Acre)']"
+                       v-model="editForm.yield_sa"
                        @onChangeSheet="editForm.yield_sa = $event"></sheet>
               </div>
             </b-col>
             <b-col id="form-edit-demand" cols="3">
               <div style="width:100%">
                 <sheet :colnames="['Demand Probability','Demand (Bushels)']"
+                       v-model="editForm.demand = $event"
                        @onChangeSheet="editForm.demand = $event"></sheet>
               </div>
             </b-col>
@@ -357,33 +360,33 @@ export default {
     return {
       models: [],
       addmodelForm: {
-        label: '',
-        starting_inventory: '',
-        price: '',
-        shortage: '',
-        salvage: '',
-        production_na: '',
-        processing_na: '',
-        production_sa: '',
-        processing_sa: '',
-        yield_na: [['', '']],
-        yield_sa: [['', '']],
-        demand: [['', '']],
+        label: null,
+        starting_inventory: null,
+        price: null,
+        shortage: null,
+        salvage: null,
+        production_na: null,
+        processing_na: null,
+        production_sa: null,
+        processing_sa: null,
+        yield_na: [],
+        yield_sa: [],
+        demand: [],
       },
       editForm: {
-        id: '',
-        label: '',
-        starting_inventory: '',
-        price: '',
-        shortage: '',
-        salvage: '',
-        production_na: '',
-        processing_na: '',
-        production_sa: '',
-        processing_sa: '',
-        yield_na: [['', '']],
-        yield_sa: [['', '']],
-        demand: [['', '']],
+        id: null,
+        label: null,
+        starting_inventory: null,
+        price: null,
+        shortage: null,
+        salvage: null,
+        production_na: null,
+        processing_na: null,
+        production_sa: null,
+        processing_sa: null,
+        yield_na: [],
+        yield_sa: [],
+        demand: [],
       },
       message: '',
       showMessage: false,
@@ -451,16 +454,16 @@ export default {
     initForm() {
       Object.keys(this.addmodelForm).forEach((key) => {
         if ((key in ['yield_na', 'yield_sa', 'demand'])) {
-          this.addmodelForm[key] = [['', '']];
+          this.addmodelForm[key] = [];
         } else {
-          this.addmodelForm[key] = '';
+          this.addmodelForm[key] = null;
         }
       });
       Object.keys(this.editForm).forEach((key) => {
         if ((key in ['yield_na', 'yield_sa', 'demand'])) {
-          this.editForm[key] = [['', '']];
+          this.editForm[key] = [];
         } else {
-          this.editForm[key] = '';
+          this.editForm[key] = null;
         }
       });
       // this.addmodelForm.starting_inventory = '';
