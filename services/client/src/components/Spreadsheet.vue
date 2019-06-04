@@ -1,5 +1,5 @@
 <template>
-    <hot-table ref="mytable" :settings="hotSettings"></hot-table>
+    <hot-table ref="mytable" :data="data" :settings="hotSettings"></hot-table>
 </template>
 
 <script>
@@ -42,13 +42,13 @@ export default {
       },
     };
   },
-  watch: {
-    value(newVal, oldVal) {
-      console.log(oldVal);
-      console.log(newVal);
-      this.$refs.mytable.hotInstance.loadData(oldVal);
-    },
-  },
+  // watch: {
+  //   value(newVal, oldVal) {
+  //     console.log(oldVal);
+  //     console.log(newVal);
+  //     this.$refs.mytable.hotInstance.loadData(oldVal);
+  //   },
+  // },
 };
 </script>
 

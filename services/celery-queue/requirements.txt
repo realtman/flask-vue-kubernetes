@@ -1,0 +1,10 @@
+celery==4.3
+flower==0.9.3
+numpy==1.16.2
+pandas==0.24.2
+psycopg2==2.8.2
+PuLP==1.6.9
+pyamqp==0.0.7.2
+scipy==1.2.1
+SQLAlchemy==1.3.3
+tornado==5.0.2

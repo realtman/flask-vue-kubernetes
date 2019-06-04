@@ -180,18 +180,21 @@
             <b-col id="form-yield_na" cols="3">
               <div style="width:100%">
                 <sheet :colnames="['NA Yield Probability','NA Yield (Bushels/Acre)']"
-                        @onChangeSheet="addmodelForm.yield_na = $event"></sheet>
+                       :value="addmodelForm.yield_na"
+                       @onChangeSheet="addmodelForm.yield_na = $event"></sheet>
               </div>
             </b-col>
             <b-col id="form-yield_sa" cols="3">
               <div style="width:100%">
                 <sheet :colnames="['SA Yield Probability','SA Yield (Bushels/Acre)']"
+                       :value="addmodelForm.yield_sa"
                        @onChangeSheet="addmodelForm.yield_sa = $event"></sheet>
               </div>
             </b-col>
             <b-col id="form-demand" cols="3">
               <div style="width:100%">
                 <sheet :colnames="['Demand Probability','Demand (Bushels)']"
+                       :value="addmodelForm.demand"
                        @onChangeSheet="addmodelForm.demand = $event"></sheet>
               </div>
             </b-col>
@@ -330,14 +333,14 @@
             <b-col id="form-edit-yield_sa" cols="3">
               <div style="width:100%">
                 <sheet :colnames="['SA Yield Probability','SA Yield (Bushels/Acre)']"
-                       v-model="editForm.yield_sa"
+                       :value="editForm.yield_sa"
                        @onChangeSheet="editForm.yield_sa = $event"></sheet>
               </div>
             </b-col>
             <b-col id="form-edit-demand" cols="3">
               <div style="width:100%">
                 <sheet :colnames="['Demand Probability','Demand (Bushels)']"
-                       v-model="editForm.demand = $event"
+                       :value="editForm.demand"
                        @onChangeSheet="editForm.demand = $event"></sheet>
               </div>
             </b-col>
