@@ -1,4 +1,4 @@
-celery==4.3
+celery==5.2.2
 flower==0.9.3
 numpy==1.16.2
 pandas==0.24.2
