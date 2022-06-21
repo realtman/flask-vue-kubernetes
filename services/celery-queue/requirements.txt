@@ -1,6 +1,6 @@
 celery==4.3
 flower==0.9.3
-numpy==1.16.2
+numpy==1.22.0
 pandas==0.24.2
 psycopg2==2.8.2
 PuLP==1.6.9
